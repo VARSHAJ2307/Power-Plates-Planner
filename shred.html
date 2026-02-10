@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>30-Day Shred Challenge — Power Plates</title>
+  <style>
+    :root{
+      --bg1:#0f172a; /* dark */
+      --bg2:#111827;
+      --accent:#ff6b6b;
+      --accent-2:#ffd166;
+      --card:#0b1220;
+      --card-2:#0f1728;
+      --glass: rgba(255,255,255,0.06);
+      --ok: #4ade80;
+      --locked: rgba(255,255,255,0.06);
+      color-scheme: dark;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body{height:100%;margin:0;}
+    body{
+      min-height:100vh;
+      background: linear-gradient(180deg, #071226 0%, #08182b 70%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:28px;
+      box-sizing:border-box;
+      color: #e6eef6;
+    }
+
+    h1{
+      margin:0 0 10px 0;
+      font-size:22px;
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .subtitle{ color: #9fb4d2; margin-bottom:18px; font-size:13px;}
+
+    /* progress area */
+    .progress-wrap{
+      width:100%;
+      max-width:980px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      padding:18px;
+      border-radius:14px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      margin-bottom:20px;
+      display:flex;
+      gap:18px;
+      align-items:center;
+    }
+
+    .progress-left{
+      flex:1;
+      min-width:220px;
+    }
+
+    .bar-bg{
+      height:14px;
+      background: rgba(255,255,255,0.06);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .bar-fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      transition: width 600ms cubic-bezier(.2,.9,.3,1);
+    }
+    .progress-meta{ font-size:13px; color:#cfe6ff; margin-top:8px; }
+
+    .badges {
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .badge {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:13px;
+      color:#fff;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      min-width:110px;
+      justify-content:center;
+    }
+    .badge.locked { opacity:0.45; filter:grayscale(0.6); }
+
+    /* grid */
+    .grid {
+      width:100%;
+      max-width:980px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap:16px;
+    }
+
+    /* card flip */
+    .card-3d {
+      perspective: 1000px;
+    }
+    .card {
+      position:relative;
+      height:180px;
+      border-radius:14px;
+      overflow:visible;
+      cursor:pointer;
+    }
+
+    .card-inner {
+      position:relative;
+      width:100%;
+      height:100%;
+      border-radius:14px;
+      transform-style: preserve-3d;
+      transition: transform 700ms cubic-bezier(.2,.9,.3,1);
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      border-radius:14px;
+      backface-visibility: hidden;
+    }
+
+    .front {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.04);
+      transform: rotateY(0deg);
+    }
+    .back {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+      transform: rotateY(180deg);
+      color:#04152a;
+    }
+
+    .day-num{ font-weight:800; font-size:16px; margin-top:10px; }
+    .icon-big{ font-size:36px; margin-bottom:8px; }
+
+    .locked-overlay{
+      position:absolute;
+      inset:0;
+      border-radius:14px;
+      background: linear-gradient(180deg, rgba(2,6,23,0.55), rgba(2,6,23,0.6));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      letter-spacing:0.6px;
+      color: #c8d8ef;
+      font-size:14px;
+    }
+
+    .complete-badge {
+      position:absolute;
+      top:10px;
+      right:10px;
+      background: linear-gradient(90deg, var(--ok), #16a34a);
+      color:#042014;
+      padding:6px 8px;
+      border-radius:8px;
+      font-weight:800;
+      font-size:12px;
+      transform: translateZ(20px);
+    }
+
+    /* back face content */
+    .back .done-title { font-size:18px; font-weight:700; margin-bottom:6px; color:#052025; }
+    .back .done-text { font-size:14px; color:#05323b; margin-bottom:8px; }
+
+    /* small controls */
+    .controls {
+      width:100%;
+      max-width:980px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:16px;
+    }
+    .btn {
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      background: linear-gradient(90deg, #1f2937, #0b1220);
+      color:#e6eef6;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+    }
+    .btn.secondary { background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); color:#cfe6ff; border:1px solid rgba(255,255,255,0.04); }
+
+    /* motivational popup */
+    .modal {
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%) scale(0.95);
+      background: linear-gradient(180deg,#ffffff,#f7fcff);
+      color:#052231;
+      padding:18px;
+      border-radius:12px;
+      box-shadow:0 16px 50px rgba(2,6,23,0.7);
+      z-index:1000;
+      width:320px;
+      display:none;
+      text-align:center;
+    }
+    .modal.show { display:block; animation: pop .18s ease-out forwards;}
+    @keyframes pop { from { transform: translate(-50%,-50%) scale(0.96);} to { transform: translate(-50%,-50%) scale(1);} }
+
+    .modal h3{ margin:6px 0 8px; }
+    .modal p{ margin:0; color:#0b2130; font-weight:600; }
+
+    /* confetti pieces (will be created via JS) */
+    .conf {
+      position:fixed;
+      width:10px;
+      height:14px;
+      opacity:0.95;
+      z-index:1200;
+      will-change: transform, opacity;
+      border-radius:2px;
+    }
+
+    /* small responsive */
+    @media (max-width:520px){
+      .progress-wrap{flex-direction:column;align-items:flex-start;gap:10px;}
+      .progress-meta{font-size:12px;}
+      .card{height:170px}
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔥 30-Day Shred Challenge</h1>
+  <div class="subtitle">Complete daily workouts, unlock the next day, collect badges — stay consistent!</div>
+
+  <!-- progress -->
+  <div class="progress-wrap" role="region" aria-label="challenge progress">
+    <div class="progress-left">
+      <div class="bar-bg" aria-hidden="true">
+        <div id="bar" class="bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-meta" id="progressMeta">0 / 30 days • 0%</div>
+    </div>
+
+    <div class="badges" aria-hidden="true">
+      <div id="badge7" class="badge locked">🏅 Week 1</div>
+      <div id="badge15" class="badge locked">🎯 Midway</div>
+      <div id="badge30" class="badge locked">🏆 Shred Master</div>
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="controls" style="max-width:980px;">
+    <button id="resetBtn" class="btn secondary">Reset Progress</button>
+    <div>
+      <button id="helpBtn" class="btn secondary">How it works</button>
+      <button id="exportBtn" class="btn">Export Progress</button>
+    </div>
+  </div>
+
+  <!-- grid -->
+  <div class="grid" id="grid" style="margin-top:16px; max-width:980px;"></div>
+
+  <!-- motivational popup -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div id="modalQuote" style="font-size:16px; font-weight:700;"></div>
+    <p id="modalSub" style="margin-top:8px; font-size:13px;"></p>
+    <div style="margin-top:12px;">
+      <button id="closeModal" class="btn">Continue</button>
+    </div>
+  </div>
+
+<script>
+  // ---------- data ----------
+  const workouts = [
+    "20 Push-ups + 30 Squats",
+    "15 Burpees + 40 Lunges",
+    "30 Jumping Jacks + 20 Sit-ups",
+    "10 Push-ups + 1 Min Plank",
+    "Rest & Mobility Flow",
+    "25 Squats + 30 Russian Twists",
+    "20 Burpees + 1 Min Mountain Climbers",
+    "15 Push-ups + 30 Jumping Jacks",
+    "40 Lunges + 20 Sit-ups",
+    "1 Min Plank + 20 Push-ups",
+    "Active Recovery - Walk 20 mins",
+    "50 Bodyweight Squats + 25 Burpees",
+    "20 Crunches + 30 Jumping Jacks",
+    "1 Min Wall Sit + 15 Push-ups",
+    "40 Lunges + 30 Sit-ups",
+    "Rest & Deep Stretch",
+    "60 Jumping Jacks + 25 Squats",
+    "20 Burpees + 1 Min Plank",
+    "15 Push-ups + 40 Lunges",
+    "30 Sit-ups + 20 Squats",
+    "Light Cardio - 25 min",
+    "25 Burpees + 50 Jumping Jacks",
+    "20 Push-ups + 30 Crunches",
+    "1 Min Mountain Climbers + 40 Squats",
+    "15 Sit-ups + 25 Push-ups",
+    "Rest & Mobility",
+    "30 Lunges + 1 Min Plank",
+    "25 Jumping Jacks + 20 Burpees",
+    "40 Crunches + 20 Squats",
+    "Final: 50 Push-ups + 100 Squats!"
+  ];
+
+  // sample icons (emojis used; could be replaced by images)
+  const icons = [
+    "💪","🔥","🏃","🧘","🦵","🏋️","⚡","🤸","🚴","🧎"
+  ];
+
+  const TOTAL = workouts.length;
+
+  // ---------- storage ----------
+  function loadProgress(){
+    try {
+      return JSON.parse(localStorage.getItem('pp_shred') || '[]');
+    } catch(e){ return []; }
+  }
+  function saveProgress(arr){ localStorage.setItem('pp_shred', JSON.stringify(arr)); }
+
+  let completed = loadProgress(); // array of completed day indexes (0-based)
+  // unlocked day logic: nextUnlocked = first index not completed, or 0 if none
+  function nextUnlockedIndex(){
+    for(let i=0;i<TOTAL;i++){ if (!completed.includes(i)) return i; }
+    return TOTAL; // all done
+  }
+
+  // ---------- UI build ----------
+  const grid = document.getElementById('grid');
+  function buildGrid(){
+    grid.innerHTML = '';
+    const unlocked = nextUnlockedIndex();
+    for(let i=0;i<TOTAL;i++){
+      const card = document.createElement('div');
+      card.className = 'card card-3d';
+      card.setAttribute('data-day', i);
+      // front/back markup
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+      inner.innerHTML = `
+        <div class="card-face front">
+          <div class="icon-big">${icons[i % icons.length]}</div>
+          <div class="day-num">Day ${i+1}</div>
+          <div style="font-size:13px;margin-top:8px;color:#cfe6ff;">${workouts[i].split(' + ')[0]}...</div>
+        </div>
+        <div class="card-face back">
+          <div class="done-title">Completed ✓</div>
+          <div class="done-text">${workouts[i]}</div>
+        </div>
+      `;
+      inner.classList.add('card-inner');
+      card.appendChild(inner);
+
+      // locked overlay if future day
+      if (i > unlocked) {
+        const overlay = document.createElement('div');
+        overlay.className = 'locked-overlay';
+        overlay.innerHTML = `🔒 Locked<br><span style="font-size:12px;margin-top:6px;display:block;color:#a9c4e6;">Complete Day ${unlocked+1} to unlock</span>`;
+        card.appendChild(overlay);
+        card.classList.add('locked');
+      }
+
+      // if completed
+      if (completed.includes(i)){
+        card.classList.add('flipped');
+        const cb = document.createElement('div');
+        cb.className = 'complete-badge';
+        cb.textContent = 'DONE';
+        card.appendChild(cb);
+      }
+
+      // click handler
+      card.addEventListener('click', () => onCardClick(i, card));
+
+      grid.appendChild(card);
+    }
+    updateProgressUI();
+  }
+
+  // ---------- progress UI ----------
+  const bar = document.getElementById('bar');
+  const progressMeta = document.getElementById('progressMeta');
+  const badge7 = document.getElementById('badge7');
+  const badge15 = document.getElementById('badge15');
+  const badge30 = document.getElementById('badge30');
+
+  function updateProgressUI(){
+    const count = completed.length;
+    const pct = Math.round((count / TOTAL) * 100);
+    bar.style.width = pct + '%';
+    progressMeta.textContent = `${count} / ${TOTAL} days • ${pct}% completed`;
+
+    // badges
+    badge7.classList.toggle('locked', count < 7);
+    badge15.classList.toggle('locked', count < 15);
+    badge30.classList.toggle('locked', count < 30);
+
+    // style unlocked badges
+    if (count >= 7) badge7.innerHTML = '🏅 Week 1';
+    else badge7.innerHTML = '🏅 Week 1';
+
+    if (count >= 15) badge15.innerHTML = '🎯 Midway';
+    else badge15.innerHTML = '🎯 Midway';
+
+    if (count >= 30) badge30.innerHTML = '🏆 Shred Master';
+    else badge30.innerHTML = '🏆 Shred Master';
+  }
+
+  // ---------- motivational quotes ----------
+  const quotes = [
+    "Great job — progress, not perfection.",
+    "One day at a time. Keep going!",
+    "Consistency builds champions.",
+    "You did the hard part — show up again tomorrow.",
+    "Small wins compound into big change."
+  ];
+
+  // ---------- confetti ----------
+  function spawnConfetti(){
+    const colors = ['#FFCE4B','#FF6B6B','#8BE58B','#6BCBFF','#C47BFF'];
+    for(let i=0;i<28;i++){
+      const el = document.createElement('div');
+      el.className = 'conf';
+      el.style.left = Math.random()*window.innerWidth + 'px';
+      el.style.top = '-20px';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.width = (6 + Math.random()*8) + 'px';
+      el.style.height = (10 + Math.random()*10) + 'px';
+      el.style.transform = `rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(el);
+
+      // animate using Web Animations if available
+      const duration = 1600 + Math.random()*1200;
+      el.animate([
+        { transform: `translateY(0px) rotate(${Math.random()*360}deg)`, opacity:1 },
+        { transform: `translateY(${window.innerHeight + 200}px) rotate(${Math.random()*1080}deg)`, opacity:0 }
+      ], { duration: duration, easing: 'cubic-bezier(.2,.9,.3,1)'});
+      setTimeout(()=> el.remove(), duration + 100);
+    }
+  }
+
+  // ---------- card click handler ----------
+  function onCardClick(index, cardEl){
+    const unlocked = nextUnlockedIndex();
+    if (index > unlocked) {
+      // locked: show small shake or message
+      flashCardLocked(cardEl);
+      return;
+    }
+    if (completed.includes(index)){
+      // already done: allow undo? ask confirm
+      if (!confirm('This day is completed. Do you want to unmark it?')) return;
+      completed = completed.filter(d=>d!==index);
+      saveProgress(completed);
+      buildGrid();
+      return;
+    }
+
+    // complete the day
+    completed.push(index);
+    saveProgress(completed);
+    // flip visual
+    cardEl.classList.add('flipped');
+    // add done badge
+    const cb = document.createElement('div');
+    cb.className = 'complete-badge';
+    cb.textContent = 'DONE';
+    cardEl.appendChild(cb);
+
+    // celebration
+    spawnConfetti();
+    showMotivation();
+
+    // update UI and auto-unlock next
+    setTimeout(()=>{
+      updateProgressUI();
+      // rebuild so locked overlays update and next day unlocks
+      buildGrid();
+    }, 700);
+  }
+
+  function flashCardLocked(cardEl){
+    cardEl.animate([
+      { transform: 'translateX(0px)' },
+      { transform: 'translateX(-8px)' },
+      { transform: 'translateX(8px)' },
+      { transform: 'translateX(0px)' }
+    ], { duration: 400, easing: 'ease' });
+  }
+
+  // motivational modal
+  const modal = document.getElementById('modal');
+  const modalQuote = document.getElementById('modalQuote');
+  const modalSub = document.getElementById('modalSub');
+  const closeModal = document.getElementById('closeModal');
+  function showMotivation(){
+    const q = quotes[Math.floor(Math.random()*quotes.length)];
+    modalQuote.textContent = q;
+    modalSub.textContent = "You've earned progress — keep the streak!";
+    modal.classList.add('show');
+  }
+  closeModal.addEventListener('click', ()=> { modal.classList.remove('show'); });
+
+  // reset/export/help buttons
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if (!confirm('Reset progress? This cannot be undone.')) return;
+    completed = [];
+    saveProgress(completed);
+    buildGrid();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify({completed, date: new Date().toISOString()}, null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'shred_progress.json'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('helpBtn').addEventListener('click', ()=>{
+    alert('Only the next locked day becomes available after you complete the current unlocked day. Complete daily workouts to progress & unlock badges at 7, 15 & 30 days.');
+  });
+
+  // init
+  buildGrid();
+  updateProgressUI();
+
+  // accessibility: tab focus to first unlocked
+  (function focusFirstUnlocked(){
+    const unlocked = nextUnlockedIndex();
+    const firstCard = document.querySelector(`.card[data-day="${unlocked}"]`);
+    if (firstCard) firstCard.tabIndex = 0;
+  })();
+
+</script>
+</body>
+</html>

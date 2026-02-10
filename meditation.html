@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meditation Timer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    select, button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    button {
+      background: #66a6ff;
+      color: white;
+      font-weight: bold;
+    }
+
+    #countdown {
+      font-size: 40px;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧘 Meditation Timer</h1>
+  <p>Select your meditation duration:</p>
+
+  <select id="duration">
+    <option value="300">5 Minutes</option>
+    <option value="600">10 Minutes</option>
+    <option value="900">15 Minutes</option>
+  </select>
+
+  <button onclick="startTimer()">Start Meditation</button>
+
+  <div id="countdown">00:00</div>
+
+  <!-- Meditation Bell Sound -->
+  <audio id="endSound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
+
+  <script>
+    let timer;
+    let countdownElement = document.getElementById("countdown");
+    let sound = document.getElementById("endSound");
+
+    function startTimer() {
+      clearInterval(timer);
+      let duration = parseInt(document.getElementById("duration").value);
+      let remaining = duration;
+
+      function updateCountdown() {
+        let mins = Math.floor(remaining / 60);
+        let secs = remaining % 60;
+        countdownElement.textContent =
+          String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+      }
+
+      updateCountdown();
+
+      timer = setInterval(() => {
+        remaining--;
+        updateCountdown();
+
+        if (remaining <= 0) {
+          clearInterval(timer);
+          sound.play(); // Play bell sound at the end
+          alert("✨ Great job! You’ve completed your meditation session.");
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

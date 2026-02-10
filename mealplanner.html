@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom Meal Planner - Power Plates Planner</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #36d1dc, #5b86e5);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      width: 420px;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #5b86e5;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin: 12px 0 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #36d1dc, #5b86e5);
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background: #f7f9fc;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .result h3 {
+      color: #36d1dc;
+      margin-bottom: 10px;
+    }
+
+    .meal-item {
+      margin: 8px 0;
+      padding: 10px;
+      background: #fff;
+      border-left: 5px solid #5b86e5;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🥗 Custom Meal Planner</h2>
+    <form id="mealForm">
+      <label for="age">Age</label>
+      <input type="number" id="age" required>
+
+      <label for="weight">Weight (kg)</label>
+      <input type="number" id="weight" required>
+
+      <label for="calories">Daily Calories</label>
+      <input type="number" id="calories" required>
+
+      <label for="workout">Workout Type</label>
+      <select id="workout" required>
+        <option value="light">Light</option>
+        <option value="moderate">Moderate</option>
+        <option value="intense">Intense</option>
+      </select>
+
+      <button type="submit">Generate Meal Plan</button>
+    </form>
+
+    <div class="result" id="result">
+      <h3>Your Custom Meal Plan 🍴</h3>
+      <div id="mealPlan"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("mealForm");
+    const result = document.getElementById("result");
+    const mealPlan = document.getElementById("mealPlan");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const calories = document.getElementById("calories").value;
+      const workout = document.getElementById("workout").value;
+
+      let plan = "";
+
+      if (workout === "light") {
+        plan = `
+          <div class="meal-item"><b>Breakfast:</b> Oatmeal with banana & honey 🍌</div>
+          <div class="meal-item"><b>Lunch:</b> Grilled chicken salad 🥗</div>
+          <div class="meal-item"><b>Dinner:</b> Veggie soup + brown bread 🍲</div>
+        `;
+      } else if (workout === "moderate") {
+        plan = `
+          <div class="meal-item"><b>Breakfast:</b> Scrambled eggs + toast 🥚</div>
+          <div class="meal-item"><b>Lunch:</b> Rice, dal, veggies & fish curry 🐟</div>
+          <div class="meal-item"><b>Dinner:</b> Grilled paneer + quinoa 🧀</div>
+        `;
+      } else if (workout === "intense") {
+        plan = `
+          <div class="meal-item"><b>Breakfast:</b> Protein smoothie + peanut butter toast 🥤</div>
+          <div class="meal-item"><b>Lunch:</b> Chicken breast, sweet potato, broccoli 🍠</div>
+          <div class="meal-item"><b>Dinner:</b> Salmon, brown rice, mixed veggies 🥦</div>
+        `;
+      }
+
+      mealPlan.innerHTML = plan;
+      result.style.display = "block";
+    });
+  </script>
+</body>
+</html>

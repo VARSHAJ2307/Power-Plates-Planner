@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customised Meal Routine</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #E0F7FA;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #B2EBF2;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    h2 {
+      color: #00796B;
+    }
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #00796B;
+    }
+    button {
+      background: #00796B;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #004D40;
+    }
+    .routine {
+      margin-top: 20px;
+      text-align: left;
+      background: #B2DFDB;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🍴 Customised Meal Routine</h2>
+    <input type="number" id="weight" placeholder="Enter your weight (kg)">
+    <input type="number" id="calories" placeholder="Daily Calorie Intake (kcal)">
+    <select id="workoutType">
+      <option value="weightloss">Weight Loss</option>
+      <option value="muscle">Muscle Gain</option>
+      <option value="maintenance">Maintenance</option>
+    </select>
+    <button onclick="generateRoutine()">Get Routine</button>
+
+    <div class="routine" id="routine"></div>
+  </div>
+
+  <script>
+    function generateRoutine() {
+      const weight = document.getElementById("weight").value;
+      const calories = document.getElementById("calories").value;
+      const workout = document.getElementById("workoutType").value;
+      const routineDiv = document.getElementById("routine");
+
+      if(!weight || !calories) {
+        alert("Please enter your weight and calorie intake!");
+        return;
+      }
+
+      let routine = "";
+
+      if(workout === "weightloss") {
+        routine = `
+          <h3>Weight Loss Routine</h3>
+          <ul>
+            <li>Breakfast: Oats with fruits - ${Math.floor(calories*0.25)} kcal</li>
+            <li>Snack: Green smoothie - ${Math.floor(calories*0.1)} kcal</li>
+            <li>Lunch: Grilled chicken salad - ${Math.floor(calories*0.35)} kcal</li>
+            <li>Dinner: Steamed veggies with fish - ${Math.floor(calories*0.3)} kcal</li>
+          </ul>
+        `;
+      } else if(workout === "muscle") {
+        routine = `
+          <h3>Muscle Gain Routine</h3>
+          <ul>
+            <li>Breakfast: Eggs & oats - ${Math.floor(calories*0.3)} kcal</li>
+            <li>Snack: Protein shake - ${Math.floor(calories*0.15)} kcal</li>
+            <li>Lunch: Chicken & rice - ${Math.floor(calories*0.35)} kcal</li>
+            <li>Dinner: Salmon & veggies - ${Math.floor(calories*0.2)} kcal</li>
+          </ul>
+        `;
+      } else {
+        routine = `
+          <h3>Maintenance Routine</h3>
+          <ul>
+            <li>Breakfast: Smoothie bowl - ${Math.floor(calories*0.25)} kcal</li>
+            <li>Snack: Nuts & fruits - ${Math.floor(calories*0.1)} kcal</li>
+            <li>Lunch: Quinoa salad - ${Math.floor(calories*0.35)} kcal</li>
+            <li>Dinner: Grilled fish & veggies - ${Math.floor(calories*0.3)} kcal</li>
+          </ul>
+        `;
+      }
+
+      routineDiv.innerHTML = routine;
+    }
+  </script>
+</body>
+</html>

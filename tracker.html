@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness & Wellness Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #2196F3;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #0d47a1;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    h2 {
+      margin-bottom: 15px;
+    }
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      background: #f44336;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #d32f2f;
+    }
+    .section {
+      margin-top: 25px;
+      padding: 15px;
+      background: #1565c0;
+      border-radius: 8px;
+      text-align: left;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress {
+      width: 0%; /* example progress */
+      height: 20px;
+      background: #4CAF50;
+      transition: width 0.3s ease;
+    }
+    .badge {
+      display: inline-block;
+      background: gold;
+      color: black;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin: 5px;
+      font-weight: bold;
+    }
+    .quote {
+      font-style: italic;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🏋️ Fitness & Wellness Tracker</h2>
+
+    <!-- Meal & Workout Log -->
+    <div class="section">
+      <h3>🍴 Meal & Workout Log</h3>
+      <select id="type">
+        <option value="Meal">Meal</option>
+        <option value="Workout">Workout</option>
+      </select>
+      <input type="text" id="details" placeholder="Enter details (e.g., Breakfast - Oats, 200 cal)">
+      <button onclick="addEntry()">Add Entry</button>
+      <div id="log"></div>
+    </div>
+
+    
+    <!-- Goal Tracker -->
+<div class="section">
+  <h3>🎯 Goal Tracker</h3>
+  <input type="number" id="currentWeight" placeholder="Enter Current Weight (e.g., 70)">
+  <input type="number" id="goalWeight" placeholder="Enter Goal Weight (e.g., 60)">
+  <button onclick="updateGoal()">Update Progress</button>
+  
+  <div class="progress-bar">
+    <div class="progress" id="progress"></div>
+  </div>
+  <p id="goalMessage">Keep Going! You are closer to your goal.</p>
+</div>
+
+
+    <!-- Streak Tracker -->
+    <div class="section">
+      <h3>🔥 Streak Tracker</h3>
+      <p id="streak">Current Streak: 0 days</p>
+      <button onclick="increaseStreak()">Log Today ✅</button>
+    </div>
+
+    <!-- Reward Badges -->
+    <div class="section">
+      <h3>🏆 Reward Badges</h3>
+      <div id="badges"></div>
+    </div>
+
+    <!-- Mood & Energy -->
+    <div class="section">
+      <h3>😊 Mood & Energy</h3>
+      <select id="mood">
+        <option>Happy</option>
+        <option>Neutral</option>
+        <option>Sad</option>
+      </select>
+      <select id="energy">
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+      </select>
+      <button onclick="logMood()">Log Mood</button>
+      <div id="moodLog"></div>
+    </div>
+
+    <!-- Daily Challenge -->
+    <div class="section">
+      <h3>🎯 Daily Challenge</h3>
+      <p id="challenge">Loading challenge...</p>
+      <button onclick="newChallenge()">Get New Challenge</button>
+    </div>
+
+    <!-- Habit Builder -->
+    <div class="section">
+      <h3>✅ Habit Builder</h3>
+      <input type="text" id="habitInput" placeholder="Enter a habit (e.g., Drink Water)">
+      <button onclick="addHabit()">Add Habit</button>
+      <ul id="habitList"></ul>
+    </div>
+
+    <!-- Daily Motivation -->
+    <div class="section">
+      <h3>✨ Daily Motivation</h3>
+      <p class="quote" id="quote"></p>
+      <button onclick="newQuote()">New Quote</button>
+    </div>
+  </div>
+
+  <script>
+    // Meal & Workout Log
+    function addEntry() {
+      let type = document.getElementById("type").value;
+      let details = document.getElementById("details").value;
+      if (details) {
+        let log = document.getElementById("log");
+        log.innerHTML += `<p>- ${type}: ${details}</p>`;
+        document.getElementById("details").value = "";
+      }
+    }
+
+    // Goal Tracker
+    // Goal Tracker
+function updateGoal() {
+  let current = parseFloat(document.getElementById("currentWeight").value);
+  let goal = parseFloat(document.getElementById("goalWeight").value);
+  let progress = document.getElementById("progress");
+  let message = document.getElementById("goalMessage");
+
+  if (!isNaN(current) && !isNaN(goal) && current > goal) {
+    let percent = Math.min(100, ((goal / current) * 100));
+    progress.style.width = percent + "%";
+
+    if (percent >= 90) {
+      message.innerText = "🔥 Amazing! You’re very close to your goal!";
+    } else if (percent >= 50) {
+      message.innerText = "💪 Great progress! Keep pushing!";
+    } else {
+      message.innerText = "🚀 Just getting started. Stay consistent!";
+    }
+  } else {
+    message.innerText = "Please enter valid weights!";
+  }
+}
+
+
+    // Streak Tracker
+    let streak = 0;
+    function increaseStreak() {
+      streak++;
+      document.getElementById("streak").innerText = `Current Streak: ${streak} days`;
+      if (streak === 3) unlockBadge("Consistency 🔥");
+      if (streak === 7) unlockBadge("1 Week Warrior 💪");
+    }
+
+    // Reward Badges
+    function unlockBadge(name) {
+      let badges = document.getElementById("badges");
+      badges.innerHTML += `<span class="badge">${name}</span>`;
+    }
+
+    // Mood & Energy
+    function logMood() {
+      let mood = document.getElementById("mood").value;
+      let energy = document.getElementById("energy").value;
+      let moodLog = document.getElementById("moodLog");
+      moodLog.innerHTML += `<p>Mood: ${mood}, Energy: ${energy}</p>`;
+    }
+
+    // Daily Challenges
+    const challenges = [
+      "Drink 8 glasses of water 💧",
+      "Walk 5,000 steps 🚶",
+      "No sugar today 🍭",
+      "Do 20 pushups 💪",
+      "Sleep 8 hours 😴"
+    ];
+    function newChallenge() {
+      let challenge = challenges[Math.floor(Math.random() * challenges.length)];
+      document.getElementById("challenge").innerText = challenge;
+    }
+    newChallenge();
+
+    // Habit Builder
+    function addHabit() {
+      let habitInput = document.getElementById("habitInput");
+      let habitList = document.getElementById("habitList");
+      if (habitInput.value) {
+        habitList.innerHTML += `<li><input type="checkbox"> ${habitInput.value}</li>`;
+        habitInput.value = "";
+      }
+    }
+
+    // Daily Motivation
+    const quotes = [
+      "Small steps every day lead to big changes.",
+      "Don’t stop until you’re proud.",
+      "Consistency beats motivation.",
+      "Your body can, your mind must believe.",
+      "Progress, not perfection."
+    ];
+    function newQuote() {
+      let q = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById("quote").innerText = q;
+    }
+    newQuote();
+  </script>
+</body>
+</html>

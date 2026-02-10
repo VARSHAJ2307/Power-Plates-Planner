@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fitness Spinner Wheel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f8b6b6;
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+      margin-top: 20px;
+      color: #333;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      margin: 40px auto;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      display: block;
+    }
+
+    .arrow {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid black; /* arrow pointing down to the wheel */
+    }
+
+    .spin-btn {
+      background: #d62828;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .spin-btn:hover { background: #a4161a; }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <h2>Fitness Spinner Wheel</h2>
+
+  <div class="wheel-container">
+    <div class="arrow"></div>
+    <canvas id="wheel" width="350" height="350"></canvas>
+  </div>
+
+  <button class="spin-btn" onclick="spinWheel()">Spin</button>
+  <div class="result" id="result"></div>
+
+  <script>
+    const wheelCanvas = document.getElementById("wheel");
+    const ctx = wheelCanvas.getContext("2d");
+
+    const segments = ["20 Squats", "Stretch", "10 Pushups", "Drink Water", "Take a Walk", "Meditate"];
+    const colors   = ["#FF6B6B", "#4D96FF", "#FFD93D", "#6BCB77", "#FF8C42", "#B983FF"];
+
+    let startAngle = 0; // radians
+    const twoPi = Math.PI * 2;
+    const arcSize = twoPi / segments.length;
+    const centerX = wheelCanvas.width / 2;
+    const centerY = wheelCanvas.height / 2;
+    const radius  = wheelCanvas.width / 2;
+
+    function drawWheel() {
+      for (let i = 0; i < segments.length; i++) {
+        const angle = startAngle + i * arcSize;
+
+        // slice
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+        ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+
+        // label
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + arcSize / 2);
+        ctx.fillStyle = "#fff";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "right";
+        ctx.fillText(segments[i], radius - 10, 6);
+        ctx.restore();
+      }
+    }
+
+    // initial draw
+    drawWheel();
+
+    let spinning = false;
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+
+      const extraSpins = 5 * 360; // at least 5 full turns
+      const spinAngle  = Math.floor(Math.random() * 360) + extraSpins; // degrees
+      const duration   = 4000; // ms
+
+      let startTime = null;
+
+      function animate(ts) {
+        if (!startTime) startTime = ts;
+        const elapsed = ts - startTime;
+
+        const easedDeg = easeOut(elapsed, 0, spinAngle, duration); // degrees
+        startAngle = (easedDeg * Math.PI) / 180; // radians
+
+        ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+        drawWheel();
+
+        if (elapsed < duration) {
+          requestAnimationFrame(animate);
+        } else {
+          // ensure final angle is exactly the intended end
+          startAngle = ((spinAngle % 360) * Math.PI) / 180;
+
+          // ------ Winner calculation (correct & robust) ------
+          // Arrow points straight down to the wheel from the TOP => pointer angle is -90° (or 270°)
+          const pointerAngle = -Math.PI / 2;
+
+          // Normalize wheel rotation to [0, 2π)
+          const norm = (startAngle % twoPi + twoPi) % twoPi;
+
+          // Angle on the wheel that sits under the pointer
+          const theta = (pointerAngle - norm + twoPi) % twoPi;
+
+          // Map to segment index (add tiny epsilon to avoid boundary rounding issues)
+          const index = Math.floor((theta + 1e-9) / arcSize) % segments.length;
+          const winner = segments[index];
+          // ----------------------------------------------------
+
+          document.getElementById("result").innerText = "Goal For Today: " + winner;
+          spinning = false;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // cubic ease-out
+    function easeOut(t, b, c, d) {
+      t /= d;
+      t--;
+      return c * (t * t * t + 1) + b;
+    }
+  </script>
+</body>
+</html>

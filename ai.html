@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Fitness Assistant — Power Plates</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-start:#36d1dc;
+      --bg-end:#5b86e5;
+      --card:#ffffff;
+      --user:#5b86e5;
+      --ai:#87CEEB;
+      --muted:#666;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background: linear-gradient(135deg,var(--bg-start),var(--bg-end));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      box-sizing:border-box;
+    }
+
+    .app {
+      width:100%;
+      max-width:900px;
+      background:var(--card);
+      border-radius:16px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.18);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      height:80vh;
+    }
+
+    /* header */
+    .app-header{
+      padding:18px 22px;
+      background:linear-gradient(90deg,var(--bg-start),var(--bg-end));
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .app-header h2{ margin:0; font-size:18px; }
+    .app-header .small { font-size:13px; opacity:0.95; }
+
+    /* chat window */
+    .chat-window{
+      flex:1;
+      padding:20px;
+      overflow-y:auto;
+      background: linear-gradient(180deg, #fbfdff, #f1f8ff);
+    }
+
+    .message {
+      max-width:78%;
+      margin:10px 0;
+      padding:12px 14px;
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.06);
+      line-height:1.4;
+    }
+
+    .message.user{
+      margin-left:auto;
+      background: linear-gradient(90deg,var(--user), #2f70c8);
+      color:white;
+      border-bottom-right-radius:4px;
+    }
+
+    .message.ai{
+      margin-right:auto;
+      background: linear-gradient(90deg,var(--ai), #63cbe6);
+      color:#01384a;
+      border-bottom-left-radius:4px;
+    }
+
+    .meta {
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+      opacity:0.9;
+    }
+
+    /* input bar */
+    .input-bar{
+      display:flex;
+      gap:10px;
+      padding:16px;
+      border-top:1px solid rgba(0,0,0,0.06);
+      align-items:center;
+      background:white;
+    }
+
+    .input-bar input[type="text"]{
+      flex:1;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid #e6eef6;
+      font-size:15px;
+      outline:none;
+    }
+
+    .input-bar button{
+      background:linear-gradient(90deg,var(--bg-start),var(--bg-end));
+      color:white;
+      border:none;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .controls {
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .small-btn {
+      padding:8px 10px;
+      border-radius:8px;
+      border:none;
+      background:#f1f5f9;
+      cursor:pointer;
+      color:#333;
+      font-weight:600;
+    }
+
+    .muted {
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* typing indicator */
+    .typing {
+      display:inline-block;
+      padding:8px 12px;
+      background:rgba(0,0,0,0.04);
+      border-radius:10px;
+      font-size:13px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    /* responsive */
+    @media (max-width:520px){
+      .app{ height:92vh; }
+      .message{ max-width:92%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="AI Fitness Assistant">
+    <div class="app-header">
+      <div>
+        <h2>🤖 AI Fitness Assistant</h2>
+        <div class="small muted">Ask about workouts, meals, or quick tips</div>
+      </div>
+      <div class="controls">
+        <button class="small-btn" id="clearChat">Clear</button>
+        <button class="small-btn" id="exportChat">Export</button>
+      </div>
+    </div>
+
+    <div id="chatWindow" class="chat-window" aria-live="polite"></div>
+
+    <div class="input-bar">
+      <input id="userInput" type="text" placeholder="Type your question — e.g. 'Suggest a 400 kcal lunch for cardio'">
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------- configuration ----------
+    const USE_BACKEND = false; // set true to send messages to your server endpoint /api/chat
+    const BACKEND_PATH = '/api/chat'; // your server route (if any)
+
+    // ---------- storage & elements ----------
+    const chatWindow = document.getElementById('chatWindow');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const clearBtn = document.getElementById('clearChat');
+    const exportBtn = document.getElementById('exportChat');
+
+    // load history if available
+    let messages = JSON.parse(localStorage.getItem('pp_chat') || '[]');
+
+    // render stored messages
+    function renderMessages() {
+      chatWindow.innerHTML = '';
+      for (const m of messages) {
+        appendMessageToDOM(m.role, m.text, false);
+      }
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // append message to local state and DOM
+    function appendMessage(role, text) {
+      const msg = { role, text, time: new Date().toISOString() };
+      messages.push(msg);
+      localStorage.setItem('pp_chat', JSON.stringify(messages));
+      appendMessageToDOM(role, text, true);
+    }
+
+    function appendMessageToDOM(role, text, animate) {
+      const wrap = document.createElement('div');
+      wrap.className = 'message ' + (role === 'user' ? 'user' : 'ai');
+      wrap.innerHTML = `<div>${escapeHtml(text)}</div><div class="meta">${new Date().toLocaleString()}</div>`;
+      chatWindow.appendChild(wrap);
+      if (animate) {
+        wrap.style.opacity = 0;
+        setTimeout(()=> { wrap.style.transition = 'opacity .25s'; wrap.style.opacity = 1; }, 8);
+      }
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // basic HTML escape
+    function escapeHtml(str){
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ---------- mock AI logic (fallback) ----------
+    function mockAIReply(userText){
+      const t = userText.toLowerCase();
+
+      // keyword matches (simple)
+      if (t.includes('calorie') || t.includes('kcal') || t.match(/\d+\s*kcal/)) {
+        return "To meet your calorie goal, balance carbs & protein. Share your calorie target and I'll suggest a quick 400–600 kcal lunch.";
+      }
+      if (t.includes('meal') || t.includes('lunch') || t.includes('breakfast') || t.includes('dinner')) {
+        return "Try: Grilled chicken + quinoa + mixed veggies (~450 kcal). Want a vegetarian option?";
+      }
+      if (t.includes('workout') || t.includes('pushup') || t.includes('squat')) {
+        return "For a quick HIIT session: 30s jumping jacks, 20s rest, 3 rounds. Ask for a 10-min routine tailored to your level.";
+      }
+      if (t.includes('water') || t.includes('hydrate')) {
+        return "Aim for 8 cups (about 2 liters) a day. If you exercise, add 1 extra cup per 30–40 minutes of activity.";
+      }
+      if (t.includes('sleep')) {
+        return "Try to get 7–8 hours nightly. Keep screen time low 30 minutes before bed and avoid heavy meals late.";
+      }
+      if (t.includes('hello') || t.includes('hi')) {
+        return "Hi! I'm your Fitness Assistant 🙌 Ask me for meal suggestions, quick workouts, or habit tips.";
+      }
+      // fallback
+      const fallbacks = [
+        "Can you give me your weight and calorie target? I can suggest a meal plan.",
+        "Would you like a 10-minute bodyweight workout or a low-impact mobility routine?",
+        "Tell me if you're trying to lose weight, gain muscle or maintain — I’ll tailor suggestions."
+      ];
+      return fallbacks[Math.floor(Math.random()*fallbacks.length)];
+    }
+
+    // ---------- typing indicator helper ----------
+    function showTypingThenReply(getReplyFn){
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.textContent = 'AI is typing...';
+      chatWindow.appendChild(typing);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+
+      setTimeout(()=> {
+        typing.remove();
+        const reply = getReplyFn();
+        appendMessage('ai', reply);
+      }, 700 + Math.random()*800); // simulate short thinking
+    }
+
+    // ---------- send to backend (if configured) ----------
+    async function sendToBackend(text){
+      try {
+        const res = await fetch(BACKEND_PATH, {
+          method:'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ message: text })
+        });
+        if (!res.ok) throw new Error('Server error');
+        const data = await res.json();
+        // expect { reply: "..." }
+        return data.reply || "Sorry, I couldn't get an answer.";
+      } catch (err) {
+        console.error('Backend call failed:', err);
+        return null;
+      }
+    }
+
+    // ---------- send message flow ----------
+    async function handleSend() {
+      const text = userInput.value.trim();
+      if (!text) return;
+      userInput.value = '';
+      appendMessage('user', text);
+
+      if (USE_BACKEND) {
+        showTypingThenReply(()=> '[waiting for server]'); // temporary until real reply arrives
+        const serverReply = await sendToBackend(text);
+        // remove the temporary typing related last element (the "AI is typing..." removed inside showTypingThenReply -> we inserted placeholder)
+        // Instead of complex DOM surgery, just append server reply:
+        appendMessage('ai', serverReply || "Sorry, server did not respond. Try again later.");
+        return;
+      }
+
+      // fallback to mock
+      showTypingThenReply(()=> mockAIReply(text));
+    }
+
+    // send on click or Enter
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
+
+    // clear chat
+    clearBtn.addEventListener('click', ()=> {
+      if (!confirm('Clear chat history?')) return;
+      messages = [];
+      localStorage.removeItem('pp_chat');
+      renderMessages();
+    });
+
+    // export chat
+    exportBtn.addEventListener('click', ()=> {
+      const blob = new Blob([JSON.stringify(messages, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pp_ai_chat.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // initial render
+    renderMessages();
+
+    // make chat accessible: focus on input
+    userInput.focus();
+  </script>
+</body>
+</html>

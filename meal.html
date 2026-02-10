@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Easy Meal Suggestions</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
+    }
+
+    header {
+      background: linear-gradient(90deg, #ff6a00, #ee0979);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      color: #ff5722;
+      margin-top: 10px;
+    }
+
+    .card p {
+      color: #555;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 14px;
+      margin-top: 10px;
+      background: linear-gradient(90deg, #ff512f, #dd2476);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: linear-gradient(90deg, #dd2476, #ff512f);
+    }
+
+    .recipe-details {
+      display: none;
+      margin-top: 15px;
+      background: #fdf1f1;
+      padding: 10px;
+      border-left: 4px solid #ff5722;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #444;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🍴 Easy Meal Suggestions (20 Recipes Daily)</header>
+
+  <div class="container">
+    <!-- Example Recipe Card -->
+    <div class="card">
+      <h3>Garlic Butter Pasta</h3>
+      <p>A quick creamy pasta with garlic, butter, and parmesan.</p>
+      <button class="btn" onclick="toggleRecipe(this)">Show Recipe</button>
+      <div class="recipe-details">
+        Boil pasta, sauté garlic in butter, mix with parmesan & serve hot.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Fresh Greek Salad</h3>
+      <p>Healthy salad with cucumbers, tomatoes, feta, and olives.</p>
+      <button class="btn" onclick="toggleRecipe(this)">Show Recipe</button>
+      <div class="recipe-details">
+        Chop cucumbers, tomatoes, red onion, olives, and feta. Toss with olive oil & lemon juice.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Tomato Basil Soup</h3>
+      <p>Warm comfort soup made with fresh tomatoes & basil.</p>
+      <button class="btn" onclick="toggleRecipe(this)">Show Recipe</button>
+      <div class="recipe-details">
+        Cook tomatoes with onion & garlic. Blend with basil and simmer with cream.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Grilled Lemon Chicken</h3>
+      <p>Juicy chicken grilled with lemon juice and herbs.</p>
+      <button class="btn" onclick="toggleRecipe(this)">Show Recipe</button>
+      <div class="recipe-details">
+        Marinate chicken with lemon, olive oil, garlic, and herbs. Grill until golden.
+      </div>
+    </div>
+
+    <!-- Add more recipes until 20 -->
+    <div class="card"><h3>Veggie Stir Fry</h3><p>Quick & colorful vegetable stir fry.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Stir-fry mixed veggies with soy sauce & sesame oil.</div></div>
+    <div class="card"><h3>Avocado Toast</h3><p>Classic breakfast toast with creamy avocado.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Mash avocado, add salt & pepper, spread on toast.</div></div>
+    <div class="card"><h3>Egg Fried Rice</h3><p>Quick & easy fried rice with eggs.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Fry rice with soy sauce, veggies & scrambled egg.</div></div>
+    <div class="card"><h3>Paneer Tikka</h3><p>Indian style marinated paneer grilled to perfection.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Marinate paneer in yogurt & spices, grill on skewers.</div></div>
+    <div class="card"><h3>Omelette</h3><p>Fluffy breakfast omelette with veggies.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Beat eggs, add onion & tomato, cook on pan.</div></div>
+    <div class="card"><h3>Fruit Smoothie</h3><p>Refreshing drink with mixed fruits.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Blend banana, berries & milk together.</div></div>
+    <div class="card"><h3>Chicken Biryani</h3><p>Flavorful Indian rice dish with chicken.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Cook rice with spices & marinated chicken.</div></div>
+    <div class="card"><h3>Veg Pulao</h3><p>Light rice dish with veggies & spices.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Cook rice with peas, carrots & cumin.</div></div>
+    <div class="card"><h3>Grilled Fish</h3><p>Fresh fish grilled with spices.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Season fish with salt & pepper, grill with lemon.</div></div>
+    <div class="card"><h3>Paratha</h3><p>Indian flatbread stuffed with potato.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Knead dough, stuff with mashed potato, cook on tawa.</div></div>
+    <div class="card"><h3>Idli Sambhar</h3><p>South Indian classic breakfast.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Steam idlis, serve with sambhar & chutney.</div></div>
+    <div class="card"><h3>Dosa</h3><p>Crispy South Indian dosa.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Spread batter on tawa, cook crispy, serve with chutney.</div></div>
+    <div class="card"><h3>Sandwich</h3><p>Simple veggie sandwich.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Layer bread with cucumber, tomato & cheese.</div></div>
+    <div class="card"><h3>Pancakes</h3><p>Fluffy American pancakes.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Mix batter, cook on pan, serve with syrup.</div></div>
+    <div class="card"><h3>Pizza</h3><p>Homemade cheesy pizza.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Spread sauce on base, add cheese & bake.</div></div>
+    <div class="card"><h3>Burger</h3><p>Juicy burger with patty & veggies.</p><button class="btn" onclick="toggleRecipe(this)">Show Recipe</button><div class="recipe-details">Grill patty, assemble with bun, cheese & lettuce.</div></div>
+
+  </div>
+
+  <script>
+    function toggleRecipe(btn) {
+      const details = btn.nextElementSibling;
+      if (details.style.display === "block") {
+        details.style.display = "none";
+        btn.textContent = "Show Recipe";
+      } else {
+        details.style.display = "block";
+        btn.textContent = "Hide Recipe";
+      }
+    }
+  </script>
+</body>
+</html>

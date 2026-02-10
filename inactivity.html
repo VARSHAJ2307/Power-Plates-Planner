@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inactivity Reminder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #FFF3E0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #FFE0B2;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    h2 {
+      color: #FF6F00;
+    }
+    button {
+      padding: 12px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      background: #FF6F00;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #E65100;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>⏰ Inactivity Reminder</h2>
+    <p>This module will notify you if you haven’t logged in for 6 hours.</p>
+    <button onclick="startTimer()">Start 6-Hour Timer</button>
+  </div>
+
+  <script>
+    function startTimer() {
+      alert("Timer started. You will get a pop-up after 6 hours of inactivity.");
+
+      // Simulate 6-hour timer with setTimeout (for demo, using 10 sec)
+      setTimeout(() => {
+        alert("Hey! You haven't logged in for a while. Time to check your fitness plan!");
+      }, 10000); // 10000 ms = 10 seconds for demo, replace with 21600000 for 6 hours
+    }
+  </script>
+</body>
+</html>
